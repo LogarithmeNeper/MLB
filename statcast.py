@@ -7,6 +7,10 @@ import time
 
 ### Notetoself:
 ### Maybe refactor on the folders (work by team, not by date?) depending on the way we use it. If so, change gitignore accordingly.
+### Maybe get the season boxplot for a pitcher.
+### Do refactoring on the code (e.g. create a function to plot the data, etc.)
+### Do refactoring (as modules?)
+### Do a README.md part for the statcast part.
 
 # Create dictionary team name to id
 mlb_teams = ['AZ', 'ATL', 'BAL', 'BOS', 'CHC', 'CWS', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KC', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY', 'OAK', 'PHI', 'PIT', 'SD', 'SEA', 'SF', 'STL', 'TB', 'TEX', 'TOR', 'WSH']
