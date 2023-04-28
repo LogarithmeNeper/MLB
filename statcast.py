@@ -2,7 +2,11 @@ import pybaseball
 import statsapi
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 import time
+
+### Notetoself:
+### Maybe refactor on the folders (work by team, not by date?) depending on the way we use it. If so, change gitignore accordingly.
 
 # Create dictionary team name to id
 mlb_teams = ['AZ', 'ATL', 'BAL', 'BOS', 'CHC', 'CWS', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KC', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY', 'OAK', 'PHI', 'PIT', 'SD', 'SEA', 'SF', 'STL', 'TB', 'TEX', 'TOR', 'WSH']
@@ -45,7 +49,7 @@ in_play_colour = {
     'grounded_into_double_play': 'brown',
 }
 
-def create_report(data: pd.DataFrame, plotting_columns: list, legend: str, mapping_dictionary: dict, title_plot: str, outfile: str, strike_zone: bool = False) -> None:
+def create_report(data: pd.DataFrame, plotting_columns: list, legend: str, mapping_dictionary: dict, title_plot: str, outfolder: str, outfile: str, strike_zone: bool = False) -> None:
     """
     Create a report of the data given a dataframe, the columns to plot, the legend and the mapping dictionary.
 
@@ -66,6 +70,9 @@ def create_report(data: pd.DataFrame, plotting_columns: list, legend: str, mappi
     title_plot : str
         The title of the plot
 
+    outfolder : str
+        The name of the output folder
+    
     outfile : str
         The name of the output file
 
@@ -96,10 +103,12 @@ def create_report(data: pd.DataFrame, plotting_columns: list, legend: str, mappi
         plt.vlines(x=0.2361, color='grey', ymin=1.5, ymax=3.5)
         plt.hlines(y=2.1666, color='grey', xmin=-0.7083, xmax=0.7083)
         plt.hlines(y=2.8334, color='grey', xmin=-0.7083, xmax=0.7083)
-        
-    plt.savefig(outfile)
+    
+    if not os.path.exists(outfolder):
+        os.makedirs(outfolder)
+    plt.savefig(os.path.join(outfolder, outfile))
 
-def get_lastgame_statcast(team: str, start_date:str = None, end_date: str = None) -> pd.DataFrame:
+def get_statcast(team: str, start_date:str = None, end_date: str = None) -> pd.DataFrame:
     """Get the last game statcast data for a team""
     
     Parameters
@@ -171,7 +180,7 @@ def generate_release_by_pitcher(data: pd.DataFrame, pitcher: str) -> None:
     pitcher_data = data[data['player_name'] == pitcher]
     pitcher_data = pitcher_data[['pitch_type', 'release_pos_x', 'release_pos_z']]
     # Generate report
-    create_report(pitcher_data, ['release_pos_x', 'release_pos_z'], 'pitch_type', pitch_type_colour, f"{pitcher} on {gamedate} [{away_team}@{home_team}] (release point)", f"{pitcher}_release_{gamedate}.png")
+    create_report(pitcher_data, ['release_pos_x', 'release_pos_z'], 'pitch_type', pitch_type_colour, f"{pitcher} on {gamedate} [{away_team}@{home_team}] (release point)", f"release_{gamedate}", f"{pitcher}_release_{gamedate}.png")
     
 
 def generate_all_release(data: pd.DataFrame) -> None:
@@ -213,7 +222,7 @@ def generate_homeplate_by_pitcher(data: pd.DataFrame, pitcher:str) -> None:
     pitcher_data = data[data['player_name'] == pitcher]
     pitcher_data = pitcher_data[['description', 'plate_x', 'plate_z']]
     # Create report
-    create_report(pitcher_data, ['plate_x', 'plate_z'], 'description', called_pitch_colour, f"{pitcher} on {gamedate} [{away_team} @ {home_team}] (homeplate)", f"{pitcher}_homeplate_{gamedate}.png", True)
+    create_report(pitcher_data, ['plate_x', 'plate_z'], 'description', called_pitch_colour, f"{pitcher} on {gamedate} [{away_team} @ {home_team}] (homeplate)", f"homeplate_{gamedate}", f"{pitcher}_homeplate_{gamedate}.png", True)
 
 def generate_all_homeplate(data: pd.DataFrame) -> None:
     """
@@ -252,15 +261,15 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     in_play_data = in_play_data[['events', 'description', 'plate_x', 'plate_z']]
     # Keep only the events in the keys of the in_play_colour dictionary
     in_play_data = in_play_data[in_play_data['events'].isin(in_play_colour.keys())]
-    create_report(in_play_data, ['plate_x', 'plate_z'], 'events', in_play_colour, f"{away_team}@{home_team} on {gamedate} (in-play) [hits against {team}'s pitchers]", f"in_play_{team}_{gamedate}.png", strike_zone=True)
+    create_report(in_play_data, ['plate_x', 'plate_z'], 'events', in_play_colour, f"{away_team}@{home_team} on {gamedate} (in-play) [hits against {team}'s pitchers]", f"in_play_{gamedate}", f"in_play_{team}_{gamedate}.png", strike_zone=True)
 
 if __name__ == '__main__':
     for team in mlb_teams:
-        data = get_lastgame_statcast(team, '2023-04-26', '2023-04-27')
+        data = get_statcast(team, '2023-04-26', '2023-04-27')
         # data.to_csv(f"{team}_data.csv")
         if data.empty:
             print(f"Team {team} has no data")
             continue
-        # generate_all_release(data)
-        # generate_all_homeplate(data)
+        generate_all_release(data)
+        generate_all_homeplate(data)
         in_play_report(data, team)
