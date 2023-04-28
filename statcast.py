@@ -240,7 +240,7 @@ def generate_all_homeplate(data: pd.DataFrame) -> None:
     for pitcher in pitchers:
         generate_homeplate_by_pitcher(data, pitcher)
 
-def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str, outfolder: str) -> None:
+def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str) -> None:
     """ 
     Generate a boxplot report for a pitcher
     
@@ -259,8 +259,12 @@ def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str, outfold
     gamedate = str(data['game_date'].unique()[0])[:10]
     home_team = data['home_team'].unique()[0]
     away_team = data['away_team'].unique()[0]
+    outfolder = f"boxplot_{gamedate}"
+    # Create folder if it doesn't exist
+    if not os.path.exists(outfolder):
+        os.makedirs(outfolder)
     pitcher_data = data[data['player_name'] == pitcher]
-    pitcher_data = pitcher_data[['pitch_type', 'release_speed', 'release_pos_x', 'release_pos_z', 'effective_speed', 'release_spin_rate']]
+    pitcher_data = pitcher_data[['pitch_type', 'release_speed', 'effective_speed', 'release_pos_x', 'release_pos_z', 'release_spin_rate', 'release_extension']]
     # Drop nan values
     pitcher_data = pitcher_data.dropna()
     # Get the pitch types
@@ -269,16 +273,19 @@ def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str, outfold
         pitch_data = pitcher_data[pitcher_data['pitch_type'] == pitch]
         # Create a matplotlib figure
         fig = plt.figure(figsize=(10, 10))
-        # For each column, create a subplot
-        for i, col in enumerate(pitch_data.columns[1:]):
+        # Create a boxplot for both release and effective speed on a single row in the figure
+        pitch_data.boxplot(column=['release_speed', 'effective_speed'], ax=fig.add_subplot(3, 1, 1), grid=False)
+        for i, col in enumerate(pitch_data.columns[3:]):
             # Create a boxplot for the column
-            ax = fig.add_subplot(3, 2, i+1)
-            ax.boxplot(pitch_data[col])
-            ax.set_xticks([])
-            ax.set_title(col)
+            ax = fig.add_subplot(3, 2, i+3)
+            ax.boxplot(pitch_data[col], vert=False)
+            ax.set_yticks([])
+            # Add title to the y axis vertically
+            ax.set_ylabel(col, rotation=90, labelpad=20)
         # Save the figure
         fig.suptitle(f"{pitch} for {pitcher} on {gamedate} [{away_team} @ {home_team}]")
-        fig.savefig(f"{pitcher}_{pitch}_{gamedate}.png")
+        filename = f"{pitcher}_{pitch}_{gamedate}.png"
+        fig.savefig(os.path.join(outfolder, filename))
         plt.close(fig)
 
 def generate_all_boxplot_report(data: pd.DataFrame) -> None:
