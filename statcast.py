@@ -182,7 +182,6 @@ def generate_release_by_pitcher(data: pd.DataFrame, pitcher: str) -> None:
     # Generate report
     create_report(pitcher_data, ['release_pos_x', 'release_pos_z'], 'pitch_type', pitch_type_colour, f"{pitcher} on {gamedate} [{away_team}@{home_team}] (release point)", f"release_{gamedate}", f"{pitcher}_release_{gamedate}.png")
     
-
 def generate_all_release(data: pd.DataFrame) -> None:
     """
     Generate a scatter plot of the release position for all pitchers and colour by pitch type
@@ -241,6 +240,62 @@ def generate_all_homeplate(data: pd.DataFrame) -> None:
     for pitcher in pitchers:
         generate_homeplate_by_pitcher(data, pitcher)
 
+def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str) -> None:
+    """ 
+    Generate a boxplot report for a pitcher
+    
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The last game statcast data for the team
+        
+    pitcher : str
+        The pitcher's name
+
+    Returns
+    -------
+    None
+    """
+    gamedate = str(data['game_date'].unique()[0])[:10]
+    home_team = data['home_team'].unique()[0]
+    away_team = data['away_team'].unique()[0]
+    pitcher_data = data[data['player_name'] == pitcher]
+
+    pitcher_data = pitcher_data[['pitch_type', 'release_speed', 'release_pos_x', 'release_pos_z', 'effective_speed', 'release_spin_rate']]
+    # Get the pitch types
+    pitch_types = pitcher_data['pitch_type'].unique().tolist()
+    for pitch in pitch_types:
+        pitch_data = pitcher_data[pitcher_data['pitch_type'] == pitch]
+        # Create a matplotlib figure
+        fig = plt.figure(figsize=(10, 10))
+        # For each column, create a subplot
+        for i, col in enumerate(pitch_data.columns[1:]):
+            # Create a boxplot for the column
+            ax = fig.add_subplot(3, 2, i+1)
+            ax.boxplot(pitch_data[col])
+            ax.set_title(col)
+        # Save the figure
+        fig.suptitle(f"{pitch} for {pitcher} on {gamedate} [{away_team} @ {home_team}]")
+        fig.savefig(f"{pitcher}_{pitch}_{gamedate}.png")
+        plt.close(fig)
+
+def generate_all_boxplot_report(data: pd.DataFrame) -> None:
+    """
+    Generate a boxplot report for all pitchers
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The last game statcast data for the team
+
+    Returns
+    -------
+    None
+    """
+    pitchers = get_lastgame_pitchers(data)
+    for pitcher in pitchers:
+        generate_boxplot_report_by_pitcher(data, pitcher)
+
 def in_play_report(data: pd.DataFrame, team: str) -> None:
     """
     Generate a report of the in play results given a game statcast data.
@@ -264,12 +319,13 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     create_report(in_play_data, ['plate_x', 'plate_z'], 'events', in_play_colour, f"{away_team}@{home_team} on {gamedate} (in-play) [hits against {team}'s pitchers]", f"in_play_{gamedate}", f"in_play_{team}_{gamedate}.png", strike_zone=True)
 
 if __name__ == '__main__':
-    for team in mlb_teams:
+    for team in ['BOS']:
         data = get_statcast(team, '2023-04-26', '2023-04-27')
-        # data.to_csv(f"{team}_data.csv")
+        data.to_csv(f"{team}_data.csv")
         if data.empty:
             print(f"Team {team} has no data")
             continue
         generate_all_release(data)
         generate_all_homeplate(data)
         in_play_report(data, team)
+        generate_all_boxplot_report(data)
