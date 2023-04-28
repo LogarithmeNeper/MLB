@@ -240,7 +240,7 @@ def generate_all_homeplate(data: pd.DataFrame) -> None:
     for pitcher in pitchers:
         generate_homeplate_by_pitcher(data, pitcher)
 
-def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str) -> None:
+def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str, outfolder: str) -> None:
     """ 
     Generate a boxplot report for a pitcher
     
@@ -260,8 +260,9 @@ def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str) -> None
     home_team = data['home_team'].unique()[0]
     away_team = data['away_team'].unique()[0]
     pitcher_data = data[data['player_name'] == pitcher]
-
     pitcher_data = pitcher_data[['pitch_type', 'release_speed', 'release_pos_x', 'release_pos_z', 'effective_speed', 'release_spin_rate']]
+    # Drop nan values
+    pitcher_data = pitcher_data.dropna()
     # Get the pitch types
     pitch_types = pitcher_data['pitch_type'].unique().tolist()
     for pitch in pitch_types:
@@ -273,6 +274,7 @@ def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str) -> None
             # Create a boxplot for the column
             ax = fig.add_subplot(3, 2, i+1)
             ax.boxplot(pitch_data[col])
+            ax.set_xticks([])
             ax.set_title(col)
         # Save the figure
         fig.suptitle(f"{pitch} for {pitcher} on {gamedate} [{away_team} @ {home_team}]")
@@ -320,7 +322,7 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
 
 if __name__ == '__main__':
     for team in ['BOS']:
-        data = get_statcast(team, '2023-04-26', '2023-04-27')
+        data = get_statcast(team, '2023-04-21', '2023-04-21')
         data.to_csv(f"{team}_data.csv")
         if data.empty:
             print(f"Team {team} has no data")
