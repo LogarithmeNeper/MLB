@@ -12,7 +12,7 @@ import time
 ### Do refactoring (as modules?)
 ### Do a README.md part for the statcast part.
 
-# Create dictionary team name to id
+# Create list of MLB teams
 mlb_teams = ['AZ', 'ATL', 'BAL', 'BOS', 'CHC', 'CWS', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KC', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY', 'OAK', 'PHI', 'PIT', 'SD', 'SEA', 'SF', 'STL', 'TB', 'TEX', 'TOR', 'WSH']
 
 # Create dictionary pitch type to colour
@@ -332,8 +332,8 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     create_report(in_play_data, ['plate_x', 'plate_z'], 'events', in_play_colour, f"{away_team}@{home_team} on {gamedate} (in-play) [hits against {team}'s pitchers]", f"in_play_{gamedate}", f"in_play_{team}_{gamedate}.png", strike_zone=True)
 
 if __name__ == '__main__':
-    for team in ['BOS']:
-        data = get_statcast(team, '2023-04-21', '2023-04-21')
+    for team in ['BOS', 'CLE']:
+        data = get_statcast(team, '2023-04-30', '2023-05-01')
         data.to_csv(f"{team}_data.csv")
         if data.empty:
             print(f"Team {team} has no data")
