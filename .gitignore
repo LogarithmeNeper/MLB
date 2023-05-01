@@ -1,0 +1,7 @@
+homeplate_*/
+release_*/
+in_play_*/
+boxplot_*/
+
+*.png
+*.csv
