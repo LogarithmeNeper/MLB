@@ -332,7 +332,7 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     create_report(in_play_data, ['plate_x', 'plate_z'], 'events', in_play_colour, f"{away_team}@{home_team} on {gamedate} (in-play) [hits against {team}'s pitchers]", f"in_play_{gamedate}", f"in_play_{team}_{gamedate}.png", strike_zone=True)
 
 if __name__ == '__main__':
-    for team in ['BOS', 'CLE']:
+    for team in ['BOS', 'TOR']:
         data = get_statcast(team, '2023-04-30', '2023-05-01')
         data.to_csv(f"{team}_data.csv")
         if data.empty:
@@ -342,3 +342,6 @@ if __name__ == '__main__':
         generate_all_homeplate(data)
         in_play_report(data, team)
         generate_all_boxplot_report(data)
+
+        data = data[['player_name', 'plate_x', 'plate_z', 'description', 'events']]
+        data.to_csv(f"{team}_pruned_data.csv")
