@@ -2,7 +2,30 @@ import pybaseball
 import pandas as pd
 from statcast import create_report
 
-def report_wrong_calls(data: pd.DataFrame) -> None:
+calls = {
+    'ball': 'green',
+    'called_strike': 'red',
+}
+
+def prune_dataset(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Keep only the rows that are called strikes outside the strikezone or balls inside the strikezone.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The data of the team.
+
+    Returns
+    -------
+    pd.DataFrame
+        The data of the team with only the rows that are called strikes outside the strikezone or balls inside the strikezone.
+    """
+    data = data[['plate_x', 'plate_z', 'description', 'delta_run_exp']]
+    data = data[(data['description'] == 'called_strike') & (data.apply(lambda row: not inside_static_strikezone(row['plate_x'], row['plate_z']), axis=1)) | (data['description'] == 'ball') & (data.apply(lambda row: inside_static_strikezone(row['plate_x'], row['plate_z']), axis=1))]
+    return data
+
+def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
     """
     Create a report of the wrong calls of an umpire.
 
@@ -16,11 +39,14 @@ def report_wrong_calls(data: pd.DataFrame) -> None:
     -------
     None
     """
-    # TODO: Implement this function
-    # Only keep the wrong calls (called strikes outside the strikezone, balls inside the strikezone)
-    # Using create_report from statcast.py, create a report of the wrong calls
-    return None
+    gamedate = str(data['game_date'].unique()[0])[:10]
+    home_team = data['home_team'].unique()[0]
+    away_team = data['away_team'].unique()[0]
+    outfolder = f"boxplot_{gamedate}"
+    data = prune_dataset(data)
+    return create_report(data, ['plate_x', 'plate_z'], 'description', calls, f"Wrong calls against {team} on {gamedate} [{away_team} @ {home_team}]", 'ump_report', f"ump_report_{team}_{gamedate}", True)
 
+# TODO refactor using prune_dataset function.
 def compute_static_scorecard_team(data: pd.DataFrame) -> float:
     """
     Computes the run advantage of a team based on the umpire's calls on the strikezone.
@@ -56,10 +82,10 @@ def inside_static_strikezone(pos_x: float, pos_z: float) -> bool:
     Parameters
     ----------
     pos_x : float
-        The x position of the pitch.
+        The x position of the pitch at the plate.
 
     pos_z : float
-        The z position of the pitch.
+        The z position of the pitch at the plate.
 
     Returns
     -------
@@ -70,9 +96,9 @@ def inside_static_strikezone(pos_x: float, pos_z: float) -> bool:
 
 if __name__ == '__main__':
     # Be careful with the dates especially when working at midnight ;)
-    data = pybaseball.statcast(team='BOS', start_dt='2023-04-30', end_dt='2023-05-01')
-    print(compute_static_scorecard_team(data))
+    data = pybaseball.statcast(team='BOS')
+    report_wrong_calls(data, 'BOS')
 
-    data2 = pybaseball.statcast(team='CLE', start_dt='2023-04-30', end_dt='2023-05-01')
-    print(compute_static_scorecard_team(data2))
+    data2 = pybaseball.statcast(team='TOR')
+    report_wrong_calls(data2, 'TOR')
     # So far, this is (maybe still) incoherent with the @UmpScorecards twitter account. Have to double check.
