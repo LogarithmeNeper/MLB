@@ -332,8 +332,8 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     create_report(in_play_data, ['plate_x', 'plate_z'], 'events', in_play_colour, f"{away_team}@{home_team} on {gamedate} (in-play) [hits against {team}'s pitchers]", f"in_play_{gamedate}", f"in_play_{team}_{gamedate}.png", strike_zone=True)
 
 if __name__ == '__main__':
-    for team in ['BOS', 'TOR']:
-        data = get_statcast(team, '2023-04-30', '2023-05-01')
+    for team in ['BOS', 'SD']:
+        data = get_statcast(team)
         data.to_csv(f"{team}_data.csv")
         if data.empty:
             print(f"Team {team} has no data")

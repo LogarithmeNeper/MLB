@@ -47,7 +47,6 @@ def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
     data = prune_dataset(data)
     return create_report(data, ['plate_x', 'plate_z'], 'description', calls, f"Wrong calls for {team}'s pitchers on {gamedate} [{away_team}@{home_team}]", 'ump_report', f"ump_report_{team}_{gamedate}", True)
 
-# TODO refactor using prune_dataset function.
 def compute_static_scorecard_team(data: pd.DataFrame) -> float:
     """
     Computes the run advantage of a team based on the umpire's calls on the strikezone.
@@ -59,20 +58,19 @@ def compute_static_scorecard_team(data: pd.DataFrame) -> float:
 
     Returns
     -------
-    float
-        The run advantage of the team. (WIP)
+    float, float
+        The run advantage of the team's pitchers and opponent's batters.
     """
     batter_advantage, pitcher_advantage = 0, 0
-    # Keep only the columns we need
-    data = data[['plate_x', 'plate_z', 'description', 'delta_run_exp']]
+    # Prune the dataset
+    data = prune_dataset(data)
     # Iterate over all pitches
     for i in range(len(data)):
-        pos_x, pos_z, description, delta_run_exp = data.iloc[i]
-        # Situation 1: called strike outside the strikezone, favouring the pitcher
-        if description == 'called_strike' and not inside_static_strikezone(pos_x, pos_z):
+        _, _, description, delta_run_exp = data.iloc[i]
+        # For both ifs, we already pruned the dataset accordingly so we don't have to check if the pitch is inside the strikezone.
+        if description == 'called_strike':
             pitcher_advantage += abs(delta_run_exp)
-        # Situation 2: called strike inside the strikezone, favouring the batter
-        if description == 'ball' and inside_static_strikezone(pos_x, pos_z):
+        if description == 'ball':
             batter_advantage += abs(delta_run_exp)
     return pitcher_advantage, batter_advantage
 
@@ -97,9 +95,12 @@ def inside_static_strikezone(pos_x: float, pos_z: float) -> bool:
 
 if __name__ == '__main__':
     # Be careful with the dates especially when working at midnight ;)
-    # data = pybaseball.statcast(team='BOS')
-    # report_wrong_calls(data, 'BOS')
+    data = pybaseball.statcast(team='BOS')
+    report_wrong_calls(data, 'BOS')
+    print(compute_static_scorecard_team(data))
 
-    data2 = pybaseball.statcast(team='TOR')
-    report_wrong_calls(data2, 'TOR')
+    data = pybaseball.statcast(team='SD')
+    report_wrong_calls(data, 'SD')
+    print(compute_static_scorecard_team(data))
+
     # So far, this is (maybe still) incoherent with the @UmpScorecards twitter account. Have to double check.
