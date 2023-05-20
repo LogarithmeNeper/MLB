@@ -23,7 +23,6 @@ def prune_dataset(data: pd.DataFrame) -> pd.DataFrame:
     """
     data = data[['plate_x', 'plate_z', 'description', 'delta_run_exp']]
     data = data[(data['description'] == 'called_strike') & (data.apply(lambda row: not inside_static_strikezone(row['plate_x'], row['plate_z']), axis=1)) | (data['description'] == 'ball') & (data.apply(lambda row: inside_static_strikezone(row['plate_x'], row['plate_z']), axis=1))]
-    data.to_csv('pruned_data.csv')
     return data
 
 def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
@@ -45,7 +44,16 @@ def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
     away_team = data['away_team'].unique()[0]
     outfolder = f"boxplot_{gamedate}"
     data = prune_dataset(data)
-    return create_report(data, ['plate_x', 'plate_z'], 'description', calls, f"Wrong calls for {team}'s pitchers on {gamedate} [{away_team}@{home_team}]", 'ump_report', f"ump_report_{team}_{gamedate}", True)
+    pitcher_advantage, batter_advantage = compute_static_scorecard_team(data)
+    return create_report(
+        data,
+        ['plate_x', 'plate_z'],
+        'description',
+        calls,
+        f"Wrong calls for {team}'s pitchers on {gamedate} [{away_team}@{home_team}]\n Pitcher advantage: {pitcher_advantage:.2f} runs \n Opp. batters advantage: {batter_advantage:.2f} runs",
+        'ump_report',
+        f"ump_report_{team}_{gamedate}",
+        True)
 
 def compute_static_scorecard_team(data: pd.DataFrame) -> float:
     """
@@ -97,10 +105,8 @@ if __name__ == '__main__':
     # Be careful with the dates especially when working at midnight ;)
     data = pybaseball.statcast(team='BOS')
     report_wrong_calls(data, 'BOS')
-    print(compute_static_scorecard_team(data))
 
     data = pybaseball.statcast(team='SD')
     report_wrong_calls(data, 'SD')
-    print(compute_static_scorecard_team(data))
 
     # So far, this is (maybe still) incoherent with the @UmpScorecards twitter account. Have to double check.

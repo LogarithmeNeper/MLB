@@ -53,7 +53,15 @@ in_play_colour = {
     'grounded_into_double_play': 'brown',
 }
 
-def create_report(data: pd.DataFrame, plotting_columns: list, legend: str, mapping_dictionary: dict, title_plot: str, outfolder: str, outfile: str, strike_zone: bool = False) -> None:
+def create_report(
+        data: pd.DataFrame,
+        plotting_columns: list,
+        legend: str,
+        mapping_dictionary: dict,
+        title_plot: str,
+        outfolder: str,
+        outfile: str,
+        strike_zone: bool = False) -> None:
     """
     Create a report of the data given a dataframe, the columns to plot, the legend and the mapping dictionary.
 
@@ -184,7 +192,15 @@ def generate_release_by_pitcher(data: pd.DataFrame, pitcher: str) -> None:
     pitcher_data = data[data['player_name'] == pitcher]
     pitcher_data = pitcher_data[['pitch_type', 'release_pos_x', 'release_pos_z']]
     # Generate report
-    create_report(pitcher_data, ['release_pos_x', 'release_pos_z'], 'pitch_type', pitch_type_colour, f"{pitcher} on {gamedate} [{away_team}@{home_team}] (release point)", f"release_{gamedate}", f"{pitcher}_release_{gamedate}.png")
+    create_report(
+        pitcher_data,
+        ['release_pos_x', 'release_pos_z'],
+        'pitch_type',
+        pitch_type_colour,
+        f"{pitcher} on {gamedate} [{away_team}@{home_team}] (release point)",
+        f"release_{gamedate}",
+        f"{pitcher}_release_{gamedate}.png"
+    )
     
 def generate_all_release(data: pd.DataFrame) -> None:
     """
@@ -225,7 +241,16 @@ def generate_homeplate_by_pitcher(data: pd.DataFrame, pitcher:str) -> None:
     pitcher_data = data[data['player_name'] == pitcher]
     pitcher_data = pitcher_data[['description', 'plate_x', 'plate_z']]
     # Create report
-    create_report(pitcher_data, ['plate_x', 'plate_z'], 'description', called_pitch_colour, f"{pitcher} on {gamedate} [{away_team} @ {home_team}] (homeplate)", f"homeplate_{gamedate}", f"{pitcher}_homeplate_{gamedate}.png", True)
+    create_report(
+        pitcher_data,
+        ['plate_x', 'plate_z'],
+        'description',
+        called_pitch_colour,
+        f"{pitcher} on {gamedate} [{away_team} @ {home_team}] (homeplate)",
+        f"homeplate_{gamedate}",
+        f"{pitcher}_homeplate_{gamedate}.png",
+        True
+    )
 
 def generate_all_homeplate(data: pd.DataFrame) -> None:
     """
@@ -329,7 +354,15 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     in_play_data = in_play_data[['events', 'description', 'plate_x', 'plate_z']]
     # Keep only the events in the keys of the in_play_colour dictionary
     in_play_data = in_play_data[in_play_data['events'].isin(in_play_colour.keys())]
-    create_report(in_play_data, ['plate_x', 'plate_z'], 'events', in_play_colour, f"{away_team}@{home_team} on {gamedate} (in-play) [hits against {team}'s pitchers]", f"in_play_{gamedate}", f"in_play_{team}_{gamedate}.png", strike_zone=True)
+    create_report(
+        in_play_data,
+        ['plate_x', 'plate_z'],
+        'events', in_play_colour,
+        f"{away_team}@{home_team} on {gamedate} (in-play) [hits against {team}'s pitchers]",
+        f"in_play_{gamedate}",
+        f"in_play_{team}_{gamedate}.png",
+        strike_zone=True
+    )
 
 if __name__ == '__main__':
     for team in ['BOS', 'SD']:
