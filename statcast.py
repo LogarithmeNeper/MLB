@@ -98,11 +98,10 @@ def create_report(
     data['colour'] = data[legend].map(mapping_dictionary)
     # Drop rows when the value in the colour column is NaN
     data = data.dropna(subset=['colour'])
-    data.plot.scatter(x=plotting_columns[0], y=plotting_columns[1], c=data['colour'])
+    data.plot.scatter(x=plotting_columns[0], y=plotting_columns[1], c=data['colour'], figsize=(9.6, 7.2))
     handles = [plt.Line2D([0], [0], marker='o', color='w', label=k, markerfacecolor=v, markersize=10) for k,v in mapping_dictionary.items()]
     plt.legend(handles=handles)
     plt.title(title_plot)
-    plt.rcParams["figure.figsize"] = (9.6, 7.2)
     
     if strike_zone:
         plt.xlim(-1.5, 1.5)
