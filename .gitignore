@@ -3,10 +3,9 @@ release_*/
 in_play_*/
 boxplot_*/
 ump_report_*/
+report_*/
 
 __pycache__/
-
-test.py
 
 *.png
 *.csv

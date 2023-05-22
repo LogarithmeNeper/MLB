@@ -13,8 +13,11 @@ Using the [pybaseball](https://github.com/jldbc/pybaseball) package, we can also
 
 So far, the results are interesting but are far from the values computed by [@UmpScorecards](https://twitter.com/UmpScorecards) on Twitter. I am still working on figuring out why the values are so different.
 
+## Pitcher Report
+
+Using the [pybaseball](https://github.com/jldbc/pybaseball), I created a way to analyse release speed, effective speed and spin rate at release for a pitcher through time. I also added a kernel estimator for the position of pitches during a year, using the [seaborn](https://seaborn.pydata.org/) library.
+
 ## Next steps
 Some features I would like to add:
 - Add a feature by searching by pitcher or by team instead of by date (yesterday being the main use case, however)
 - ...
-- 
