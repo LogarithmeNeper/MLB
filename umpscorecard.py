@@ -105,5 +105,6 @@ if __name__ == '__main__':
     # Be careful with the dates especially when working at midnight ;)
     for team in mlb_teams:
         data = pybaseball.statcast(team=team)
-        report_wrong_calls(data, team)
+        if not data.empty:
+            report_wrong_calls(data, team)
     # So far, this is (maybe still) incoherent with the @UmpScorecards twitter account. Have to double check.

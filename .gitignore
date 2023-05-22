@@ -6,5 +6,7 @@ ump_report_*/
 
 __pycache__/
 
+test.py
+
 *.png
 *.csv

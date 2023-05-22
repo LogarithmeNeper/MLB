@@ -118,6 +118,7 @@ def create_report(
     if not os.path.exists(outfolder):
         os.makedirs(outfolder)
     plt.savefig(os.path.join(outfolder, outfile))
+    plt.close()
 
 def get_statcast(team: str, start_date:str = None, end_date: str = None) -> pd.DataFrame:
     """Get the last game statcast data for a team""
@@ -366,7 +367,7 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
 if __name__ == '__main__':
     for team in ['BOS', 'SD']:
         data = get_statcast(team)
-        data.to_csv(f"{team}_data.csv")
+        # data.to_csv(f"{team}_data.csv")
         if data.empty:
             print(f"Team {team} has no data")
             continue
@@ -375,5 +376,5 @@ if __name__ == '__main__':
         in_play_report(data, team)
         generate_all_boxplot_report(data)
 
-        data = data[['player_name', 'plate_x', 'plate_z', 'description', 'events']]
-        data.to_csv(f"{team}_pruned_data.csv")
+        # data = data[['player_name', 'plate_x', 'plate_z', 'description', 'events']]
+        # data.to_csv(f"{team}_pruned_data.csv")
