@@ -4,7 +4,23 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+#TODO: Move statcast pitcher report for a single game in this file. 
+#(or not, considering that it is a single game, and not a season)
+
 def get_player_id(name: str) -> int:
+    """
+    Get the player id of a player.
+
+    Parameters
+    ----------
+    name : str
+        The name of the player.
+
+    Returns
+    ------- 
+    int
+        The player id of the player.
+    """
     player_id = pybaseball.playerid_lookup(name.split()[1], name.split()[0])
     return player_id['key_mlbam'][0]
 
