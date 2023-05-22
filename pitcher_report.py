@@ -83,6 +83,24 @@ def create_boxplot_report(pitcher_name: str, year: str):
     create_boxplot_report_pitcher(data, pitcher_name, year)
 
 def create_kernel_report_pitcher(data: pd.DataFrame, pitcher_name: str, year: str) -> None:
+    """
+    Creates a kernel estimate of the pitch location of a pitcher during a year.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The data of the pitcher.
+
+    pitcher_name : str
+        The name of the pitcher.
+
+    year : str
+        The year of the data.
+
+    Returns
+    -------
+    None
+    """
     data = data[data['pitch_type'].notna()]
     pitch_types = data['pitch_type'].unique()
     outfolder = f"report_{pitcher_name}_{year}"
@@ -114,7 +132,21 @@ def create_kernel_report_pitcher(data: pd.DataFrame, pitcher_name: str, year: st
         plt.savefig(f"{outfolder}/{pitch_type}_heatmap.png")
         plt.close()
 
-def create_kernel_report(pitcher_name: str, year: str):
+def create_kernel_report(pitcher_name: str, year: str) -> None:
+    """
+    Aggregate the functions to create a kernel estimate of the pitch location of a pitcher during a year.
+
+    Parameters
+    ----------
+    pitcher_name : str
+        The name of the pitcher.
+    year : str
+        The year of the data.
+
+    Returns
+    -------
+    None
+    """
     pitcher_id = get_player_id(pitcher_name)
     data = get_pitcher_data(pitcher_id, year)
     create_kernel_report_pitcher(data, pitcher_name, year)
