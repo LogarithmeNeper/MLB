@@ -7,6 +7,10 @@ Using the [pybaseball](https://github.com/jldbc/pybaseball) package, we can pull
 - Team report on hits (colour on result of the play)
 - Pitcher analysis for each pitch type on various metrics (e.g. release speed, effective speed, spin rate, extension, etc.)
 
+## Pitcher Report
+
+Using the [pybaseball](https://github.com/jldbc/pybaseball), I created a way to analyse release speed, effective speed and spin rate at release for a pitcher through time. I also added a kernel estimator for the position of pitches during a year, using the [seaborn](https://seaborn.pydata.org/) library.
+
 Some features I would like to add:
 - Dupe of UmpScorecard, with Statcast data, with effective plate coverage of the umpire (vertical depending ont the batter stance)
 - Add a feature by searching by pitcher or by team instead of by date (yesterday being the main use case, however)
