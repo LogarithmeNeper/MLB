@@ -43,7 +43,7 @@ def create_report_pitcher(data: pd.DataFrame, pitcher_name: str, year: str) -> N
     None
     """
     data = data[data['pitch_type'].notna()]
-    outfolder = f"{pitcher_name}_{year}"
+    outfolder = f"report_{pitcher_name}_{year}"
     if not os.path.exists(outfolder):
         os.makedirs(outfolder)
     cols = ['release_speed', 'effective_speed', 'release_spin_rate']
@@ -58,9 +58,9 @@ def create_report_pitcher(data: pd.DataFrame, pitcher_name: str, year: str) -> N
                 date = dates[i]
                 gameday_data = pitch_data[pitch_data['game_date'] == date]
                 # Create a boxplot on the figure for each date
-                plt.boxplot(gameday_data[col], positions=[i], widths=0.5)
+                plt.boxplot(gameday_data[col], positions=[i], widths=0.5, labels=[date])
                 # Under each boxplot, indicate the date
-                plt.text(i, 0, date, rotation=90, ha='center', va='bottom')
+                # plt.text(i, 0, date, rotation=90, ha='center', va='bottom')
             # Set the title of the figure
             plt.title(f"{pitcher_name}'s {pitch_type} {col} during {year}")
             # Save the figure in outfolder
