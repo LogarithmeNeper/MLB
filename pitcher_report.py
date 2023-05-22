@@ -52,20 +52,16 @@ def create_report_pitcher(data: pd.DataFrame, pitcher_name: str, year: str) -> N
         for pitch_type in pitch_types:
             pitch_data = data[data['pitch_type'] == pitch_type]
             dates = pitch_data['game_date'].unique()
-            # Create a matplotlib figure
             fig = plt.figure(figsize=(12, 8))
             for i in range(len(dates)):
                 date = dates[i]
                 gameday_data = pitch_data[pitch_data['game_date'] == date]
-                # Create a boxplot on the figure for each date
                 plt.boxplot(gameday_data[col], positions=[i], widths=0.5, labels=[date])
-                # Under each boxplot, indicate the date
-                # plt.text(i, 0, date, rotation=90, ha='center', va='bottom')
             # Set the title of the figure
             plt.title(f"{pitcher_name}'s {pitch_type} {col} during {year}")
-            # Save the figure in outfolder
+            plt.xlabel("Date")
+            plt.ylabel(col)
             plt.savefig(f"{outfolder}/{pitch_type}_{col}.png")
-            # Close the figure
             plt.close(fig)
 
 def create_report(pitcher_name: str, year: str):
