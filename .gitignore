@@ -8,4 +8,5 @@ report_*/
 __pycache__/
 
 *.png
+!examples/*.png
 *.csv

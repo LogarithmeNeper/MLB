@@ -146,7 +146,7 @@ def create_kernel_report_pitcher(data: pd.DataFrame, pitcher_name: str, year: st
         sns.kdeplot(x=pitch_data['plate_x'], y=pitch_data['plate_z'], cmap='Reds', shade=True, thresh=0.05, n_levels=40)#, cbar=True, cbar_kws={'label': 'Density'})
 
         # Save the plot
-        plt.savefig(f"{outfolder}/{pitch_type}_heatmap.png")
+        plt.savefig(f"{outfolder}/{pitch_type}_kernel.png")
         plt.close()
 
 def create_kernel_report(pitcher_name: str, year: str) -> None:
@@ -169,6 +169,5 @@ def create_kernel_report(pitcher_name: str, year: str) -> None:
     create_kernel_report_pitcher(data, pitcher_name, year)
 
 if __name__ == "__main__":
-    # create_boxplot_report("Corey Kluber", "2023")
-    create_kernel_report("Chris Sale", "2023")
-    create_kernel_report("Tanner Houck", "2023")
+    create_boxplot_report("Chris Sale", "2018")
+    create_kernel_report("Chris Sale", "2018")
