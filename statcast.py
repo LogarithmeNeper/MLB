@@ -365,7 +365,7 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     )
 
 if __name__ == '__main__':
-    for team in ['BOS', 'SD']:
+    for team in ['BOS', 'LAA']:
         data = get_statcast(team)
         # data.to_csv(f"{team}_data.csv")
         if data.empty:
