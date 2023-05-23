@@ -51,7 +51,7 @@ def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
         'description',
         calls,
         f"Wrong calls for {team}'s pitchers on {gamedate} [{away_team}@{home_team}]\n Pitcher advantage: {pitcher_advantage:.2f} runs \n Opp. batters advantage: {batter_advantage:.2f} runs",
-        'ump_report',
+        f"ump_report_{gamedate}", 
         f"ump_report_{team}_{gamedate}",
         True)
 
@@ -99,7 +99,8 @@ def inside_static_strikezone(pos_x: float, pos_z: float) -> bool:
     bool
         Whether the pitch is inside the static strikezone.
     """
-    return (pos_x >= -0.7083 and pos_x <= 0.7083 and pos_z >= 1.5 and pos_z <= 3.5)
+    # return (pos_x >= -0.7083 and pos_x <= 0.7083 and pos_z >= 1.5 and pos_z <= 3.5)
+    return (pos_x >= -0.7083-0.242782/2 and pos_x <= 0.7083+0.242782/2 and pos_z >= 1.5-0.242782/2 and pos_z <= 3.5+0.242782/2)
 
 if __name__ == '__main__':
     # Be careful with the dates especially when working at midnight ;)
