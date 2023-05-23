@@ -104,11 +104,13 @@ def create_report(
     plt.title(title_plot)
     
     if strike_zone:
-        plt.xlim(-1.5, 1.5)
+        plt.xlim(-2, 2)
         plt.ylim(1, 4)
         # Plot the strike zone
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=False))
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=True, alpha=0.1))
+        # Add an extended strikezone (1 ball width up and down, 1 ball width to the left and right)
+        plt.gca().add_patch(plt.Rectangle((-0.7083-0.242782/2, 1.5-0.242782/2), (0.7083+0.242782/2)*2, 3.5-1.5+0.242782/2*2, fill=False, linestyle='--', color='grey'))
         # Separate the strike zone into 9 squares 
         plt.vlines(x=-0.2361, color='grey', ymin=1.5, ymax=3.5)
         plt.vlines(x=0.2361, color='grey', ymin=1.5, ymax=3.5)
