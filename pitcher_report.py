@@ -142,7 +142,7 @@ def create_kernel_report_pitcher(data: pd.DataFrame, pitcher_name: str, year: st
         plt.hlines(y=2.8334, color='grey', xmin=-0.7083, xmax=0.7083)
 
         # Plot a kernel estimate of the pitch location plate_x and plate_z using seaborn
-        sns.kdeplot(pitch_data['plate_x'], pitch_data['plate_z'], cmap='Reds', shade=True, thresh=0.05, n_levels=25)
+        sns.kdeplot(x=pitch_data['plate_x'], y=pitch_data['plate_z'], cmap='Reds', shade=True, thresh=0.05, n_levels=25)
 
         # Save the plot
         plt.savefig(f"{outfolder}/{pitch_type}_heatmap.png")
