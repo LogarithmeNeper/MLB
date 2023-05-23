@@ -130,11 +130,12 @@ def create_kernel_report_pitcher(data: pd.DataFrame, pitcher_name: str, year: st
         plt.title(title_plot)
 
         # Taken from statcast.py
-        plt.xlim(-1.5, 1.5)
+        plt.xlim(-2, 2)
         plt.ylim(1, 4)
         # Plot the strike zone
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=False))
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=True, alpha=0.1))
+        plt.gca().add_patch(plt.Rectangle((-0.7083-0.242782/2, 1.5-0.242782/2), (0.7083+0.242782/2)*2, 3.5-1.5+0.242782/2*2, fill=False, linestyle='--', color='grey'))
         # Separate the strike zone into 9 squares 
         plt.vlines(x=-0.2361, color='grey', ymin=1.5, ymax=3.5)
         plt.vlines(x=0.2361, color='grey', ymin=1.5, ymax=3.5)
@@ -142,7 +143,7 @@ def create_kernel_report_pitcher(data: pd.DataFrame, pitcher_name: str, year: st
         plt.hlines(y=2.8334, color='grey', xmin=-0.7083, xmax=0.7083)
 
         # Plot a kernel estimate of the pitch location plate_x and plate_z using seaborn
-        sns.kdeplot(x=pitch_data['plate_x'], y=pitch_data['plate_z'], cmap='Reds', shade=True, thresh=0.05, n_levels=25)
+        sns.kdeplot(x=pitch_data['plate_x'], y=pitch_data['plate_z'], cmap='Reds', shade=True, thresh=0.05, n_levels=40)#, cbar=True, cbar_kws={'label': 'Density'})
 
         # Save the plot
         plt.savefig(f"{outfolder}/{pitch_type}_heatmap.png")
