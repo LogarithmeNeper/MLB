@@ -104,8 +104,8 @@ def create_report(
     plt.title(title_plot)
     
     if strike_zone:
-        plt.xlim(-2, 2)
-        plt.ylim(1, 4)
+        plt.xlim(-3, 3)
+        plt.ylim(0, 5)
         # Plot the strike zone
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=False))
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=True, alpha=0.1))
@@ -367,9 +367,9 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     )
 
 if __name__ == '__main__':
-    for team in ['BOS', 'LAD']:
-        data = get_statcast(team, '2018-10-28', '2018-10-29')
-        # data.to_csv(f"{team}_data.csv")
+    for team in mlb_teams:
+        data = get_statcast(team)
+        data.to_csv(f"{team}_data.csv")
         if data.empty:
             print(f"Team {team} has no data")
             continue
