@@ -5,13 +5,6 @@ import matplotlib.pyplot as plt
 import os
 import time
 
-### Notetoself:
-### Maybe refactor on the folders (work by team, not by date?) depending on the way we use it. If so, change gitignore accordingly.
-### Maybe get the season boxplot for a pitcher.
-### Do refactoring on the code (e.g. create a function to plot the data, etc.)
-### Do refactoring (as modules?)
-### Do a README.md part for the statcast part.
-
 # Create list of MLB teams
 mlb_teams = ['AZ', 'ATL', 'BAL', 'BOS', 'CHC', 'CWS', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KC', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY', 'OAK', 'PHI', 'PIT', 'SD', 'SEA', 'SF', 'STL', 'TB', 'TEX', 'TOR', 'WSH']
 
@@ -37,10 +30,11 @@ pitch_type_colour = {
 }
 
 called_pitch_colour = {
+    'foul': 'pink',
     'hit_into_play': 'blue',
     'ball': 'green',
-    'foul': 'pink',
     'called_strike': 'red',
+    'swinging_strike_blocked': 'orange',
     'swinging_strike': 'yellow',
 }
 
@@ -98,7 +92,7 @@ def create_report(
     data['colour'] = data[legend].map(mapping_dictionary)
     # Drop rows when the value in the colour column is NaN
     data = data.dropna(subset=['colour'])
-    data.plot.scatter(x=plotting_columns[0], y=plotting_columns[1], c=data['colour'], figsize=(9.6, 7.2))
+    data.plot.scatter(x=plotting_columns[0], y=plotting_columns[1], c=data['colour'], figsize=(9.6, 7.2), edgecolors='black', linewidths=0.5)
     handles = [plt.Line2D([0], [0], marker='o', color='w', label=k, markerfacecolor=v, markersize=10) for k,v in mapping_dictionary.items()]
     
     if strike_zone:
@@ -108,12 +102,11 @@ def create_report(
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=False))
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=True, alpha=0.1))
         # Add an extended strikezone (1 ball width up and down, 1 ball width to the left and right)
-        plt.gca().add_patch(plt.Rectangle((-0.7083-0.242782/2, 1.5-0.242782/2), (0.7083+0.242782/2)*2, 3.5-1.5+0.242782/2*2, fill=False, linestyle='--', color='grey'))
-        # Add a legend for the continuous and dashed lines with the handles as well
+        plt.gca().add_patch(plt.Rectangle((-0.7083-0.241667/2, 1.5-0.241667/2), (0.7083+0.241667/2)*2, 3.5-1.5+0.241667/2*2, fill=False, linestyle='--', color='grey'))
 
         handles.append(plt.Line2D([0], [0], linestyle='--', color='grey', label='Extended strike zone'))
         handles.append(plt.Line2D([0], [0], linestyle='-', color='grey', label='Strike zone'))
- 
+
         # Separate the strike zone into 9 squares 
         plt.vlines(x=-0.2361, color='grey', ymin=1.5, ymax=3.5)
         plt.vlines(x=0.2361, color='grey', ymin=1.5, ymax=3.5)
@@ -254,7 +247,7 @@ def generate_homeplate_by_pitcher(data: pd.DataFrame, pitcher:str) -> None:
         ['plate_x', 'plate_z'],
         'description',
         called_pitch_colour,
-        f"{pitcher} on {gamedate} [{away_team} @ {home_team}] (homeplate)",
+        f"{pitcher} on {gamedate} [{away_team}@{home_team}] (homeplate)",
         f"homeplate_{gamedate}",
         f"{pitcher}_homeplate_{gamedate}.png",
         True
@@ -320,7 +313,7 @@ def generate_boxplot_report_by_pitcher(data: pd.DataFrame, pitcher: str) -> None
             # Add title to the y axis vertically
             ax.set_ylabel(col, rotation=90, labelpad=20)
         # Save the figure
-        fig.suptitle(f"{pitch} for {pitcher} on {gamedate} [{away_team} @ {home_team}]")
+        fig.suptitle(f"{pitch} for {pitcher} on {gamedate} [{away_team}@{home_team}]")
         filename = f"{pitcher}_{pitch}_{gamedate}.png"
         fig.savefig(os.path.join(outfolder, filename))
         plt.close(fig)
@@ -375,7 +368,6 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
 if __name__ == '__main__':
     for team in mlb_teams:
         data = get_statcast(team)
-        data.to_csv(f"{team}_data.csv")
         if data.empty:
             print(f"Team {team} has no data")
             continue
@@ -383,6 +375,3 @@ if __name__ == '__main__':
         generate_all_homeplate(data)
         in_play_report(data, team)
         generate_all_boxplot_report(data)
-
-        # data = data[['player_name', 'plate_x', 'plate_z', 'description', 'events']]
-        # data.to_csv(f"{team}_pruned_data.csv")
