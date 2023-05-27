@@ -100,8 +100,6 @@ def create_report(
     data = data.dropna(subset=['colour'])
     data.plot.scatter(x=plotting_columns[0], y=plotting_columns[1], c=data['colour'], figsize=(9.6, 7.2))
     handles = [plt.Line2D([0], [0], marker='o', color='w', label=k, markerfacecolor=v, markersize=10) for k,v in mapping_dictionary.items()]
-    plt.legend(handles=handles)
-    plt.title(title_plot)
     
     if strike_zone:
         plt.xlim(-3, 3)
@@ -111,12 +109,20 @@ def create_report(
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=True, alpha=0.1))
         # Add an extended strikezone (1 ball width up and down, 1 ball width to the left and right)
         plt.gca().add_patch(plt.Rectangle((-0.7083-0.242782/2, 1.5-0.242782/2), (0.7083+0.242782/2)*2, 3.5-1.5+0.242782/2*2, fill=False, linestyle='--', color='grey'))
+        # Add a legend for the continuous and dashed lines with the handles as well
+
+        handles.append(plt.Line2D([0], [0], linestyle='--', color='grey', label='Extended strike zone'))
+        handles.append(plt.Line2D([0], [0], linestyle='-', color='grey', label='Strike zone'))
+ 
         # Separate the strike zone into 9 squares 
         plt.vlines(x=-0.2361, color='grey', ymin=1.5, ymax=3.5)
         plt.vlines(x=0.2361, color='grey', ymin=1.5, ymax=3.5)
         plt.hlines(y=2.1666, color='grey', xmin=-0.7083, xmax=0.7083)
         plt.hlines(y=2.8334, color='grey', xmin=-0.7083, xmax=0.7083)
-    
+        
+    plt.legend(handles=handles)
+    plt.title(title_plot)
+
     if not os.path.exists(outfolder):
         os.makedirs(outfolder)
     plt.savefig(os.path.join(outfolder, outfile))
