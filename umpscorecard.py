@@ -100,7 +100,7 @@ def inside_static_strikezone(pos_x: float, pos_z: float) -> bool:
         Whether the pitch is inside the static strikezone.
     """
     # return (pos_x >= -0.7083 and pos_x <= 0.7083 and pos_z >= 1.5 and pos_z <= 3.5)
-    return (pos_x >= -0.7083-0.241667 and pos_x <= 0.7083+0.241667 and pos_z >= 1.5-0.241667 and pos_z <= 3.5+0.241667)
+    return (pos_x >= -0.7083-0.241667/2 and pos_x <= 0.7083+0.241667/2 and pos_z >= 1.5-0.241667/2 and pos_z <= 3.5+0.241667/2)
 
 if __name__ == '__main__':
     # Be careful with the dates especially when working at midnight ;)

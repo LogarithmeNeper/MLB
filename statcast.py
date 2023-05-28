@@ -102,7 +102,7 @@ def create_report(
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=False))
         plt.gca().add_patch(plt.Rectangle((-0.7083, 1.5), 0.7083*2, 3.5-1.5, fill=True, alpha=0.1))
         # Add an extended strikezone (1 ball width up and down, 1 ball width to the left and right)
-        plt.gca().add_patch(plt.Rectangle((-0.7083-0.241667, 1.5-0.241667), (0.7083+0.241667)*2, 3.5-1.5+0.241667*2, fill=False, linestyle='--', color='grey'))
+        plt.gca().add_patch(plt.Rectangle((-0.7083-0.241667/2, 1.5-0.241667/2), (0.7083+0.241667/2)*2, 3.5-1.5+0.241667/2*2, fill=False, linestyle='--', color='grey'))
 
         handles.append(plt.Line2D([0], [0], linestyle='--', color='grey', label='Extended strike zone'))
         handles.append(plt.Line2D([0], [0], linestyle='-', color='grey', label='Strike zone'))
