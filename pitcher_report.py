@@ -169,5 +169,5 @@ def create_kernel_report(pitcher_name: str, year: str) -> None:
     create_kernel_report_pitcher(data, pitcher_name, year)
 
 if __name__ == "__main__":
-    create_boxplot_report("Chris Sale", "2018")
-    create_kernel_report("Chris Sale", "2018")
+    create_boxplot_report("Chris Sale", "2023")
+    create_kernel_report("Chris Sale", "2023")
