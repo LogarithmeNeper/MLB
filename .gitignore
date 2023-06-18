@@ -5,6 +5,8 @@ boxplot_*/
 ump_report_*/
 report_*/
 
+test.py
+
 __pycache__/
 
 *.png
