@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import time
+import math
 
 # Create list of MLB teams
 mlb_teams = ['AZ', 'ATL', 'BAL', 'BOS', 'CHC', 'CWS', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KC', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY', 'OAK', 'PHI', 'PIT', 'SD', 'SEA', 'SF', 'STL', 'TB', 'TEX', 'TOR', 'WSH']
@@ -44,6 +45,8 @@ in_play_colour = {
     'triple': 'pink',
     'home_run': 'red',
     'field_out': 'lightgrey',
+    'force_out': 'lightgrey',
+    'fielders_choice': 'lightblue',
     'grounded_into_double_play': 'brown',
 }
 
@@ -55,6 +58,7 @@ def create_report(
         title_plot: str,
         outfolder: str,
         outfile: str,
+        radar_zone: bool = False,
         strike_zone: bool = False) -> None:
     """
     Create a report of the data given a dataframe, the columns to plot, the legend and the mapping dictionary.
@@ -82,6 +86,9 @@ def create_report(
     outfile : str
         The name of the output file
 
+    radar_zone : bool
+        Whether to plot the radar zone or not
+
     strike_zone : bool
         Whether to plot the strike zone or not
 
@@ -95,6 +102,23 @@ def create_report(
     data.plot.scatter(x=plotting_columns[0], y=plotting_columns[1], c=data['colour'], figsize=(9.6, 7.2), edgecolors='black', linewidths=0.5)
     handles = [plt.Line2D([0], [0], marker='o', color='w', label=k, markerfacecolor=v, markersize=10) for k,v in mapping_dictionary.items()]
     
+    if radar_zone:
+        print("Plotting radar zone")
+        plt.xlim(-1, 1)
+        plt.ylim(-1, 1)
+        # Add a circle of radius 0.25, 0.5, 0.75 and 1 centered at (0,0) corresponding to 30 mph, 60 mph, 90 mph and 120 mph, fill grey gradients of colours, (outer being the darkest and inner being the lighter), and add the colour to the legend
+        plt.gca().add_patch(plt.Circle((0, 0), 0.25, fill=False, linestyle='--', color='grey'))
+        plt.gca().add_patch(plt.Circle((0, 0), 0.25, fill=True, alpha=0.1, color='grey'))
+
+        plt.gca().add_patch(plt.Circle((0, 0), 0.5, fill=False, linestyle='--', color='grey'))
+        plt.gca().add_patch(plt.Circle((0, 0), 0.5, fill=True, alpha=0.2, color='grey'))
+
+        plt.gca().add_patch(plt.Circle((0, 0), 0.75, fill=False, linestyle='--', color='grey'))
+        plt.gca().add_patch(plt.Circle((0, 0), 0.75, fill=True, alpha=0.3, color='grey'))
+
+        plt.gca().add_patch(plt.Circle((0, 0), 1, fill=False, linestyle='--', color='grey'))
+        plt.gca().add_patch(plt.Circle((0, 0), 1, fill=True, alpha=0.4, color='grey'))
+
     if strike_zone:
         plt.xlim(-3, 3)
         plt.ylim(0, 5)
@@ -335,6 +359,36 @@ def generate_all_boxplot_report(data: pd.DataFrame) -> None:
     for pitcher in pitchers:
         generate_boxplot_report_by_pitcher(data, pitcher)
 
+def prune_hits_dataset(data):
+    data = data[data['description'] == 'hit_into_play']
+    # Keep only the columns we need
+    data = data[['pitch_type', 'release_speed', 'events', 'description', 'plate_x', 'plate_z', 'hit_distance_sc', 'launch_speed', 'launch_angle', 'effective_speed', 'estimated_ba_using_speedangle', 'estimated_woba_using_speedangle', 'woba_value', 'delta_home_win_exp', 'delta_run_exp']]
+    return data
+
+def create_radar_report(data, team):
+    gamedate = str(data['game_date'].unique()[0])[:10]
+    home_team = data['home_team'].unique()[0]
+    away_team = data['away_team'].unique()[0]
+    usable_data = prune_hits_dataset(data)
+    # Create a r, theta values for the radar plot
+    # r = launch_speed / 120
+    # theta = launch_angle
+    # x, y values are cos(theta) * r, sin(theta) * r
+    usable_data['x'] = usable_data['launch_speed'] / 120 * usable_data['launch_angle'].apply(lambda x: math.cos(math.radians(x)))
+    usable_data['y'] = usable_data['launch_speed'] / 120 *  usable_data['launch_angle'].apply(lambda x: math.sin(math.radians(x)))
+
+    # Create a radar plot for the whole dataset, colour by in_play_colour
+    create_report(
+        usable_data,
+        ['x', 'y'],
+        'events', in_play_colour,
+        f"{away_team}@{home_team} on {gamedate} (in-play) [hits against {team}'s pitchers]",
+        f"in_play_{gamedate}",
+        f"radar_in_play_{team}_{gamedate}.png",
+        radar_zone=True
+    )
+
+
 def in_play_report(data: pd.DataFrame, team: str) -> None:
     """
     Generate a report of the in play results given a game statcast data.
@@ -366,12 +420,15 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     )
 
 if __name__ == '__main__':
-    for team in mlb_teams:
-        data = get_statcast(team)
-        if data.empty:
-            print(f"Team {team} has no data")
-            continue
-        generate_all_release(data)
-        generate_all_homeplate(data)
-        in_play_report(data, team)
-        generate_all_boxplot_report(data)
+    # for team in mlb_teams:
+    #     data = get_statcast(team)
+    #     if data.empty:
+    #         print(f"Team {team} has no data")
+    #         continue
+    #     generate_all_release(data)
+    #     generate_all_homeplate(data)
+    #     in_play_report(data, team)
+    #     generate_all_boxplot_report(data)
+    team = 'BOS'
+    data = get_statcast(team=team, start_date='2023-06-16', end_date='2023-06-16')
+    create_radar_report(data, team)
