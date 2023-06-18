@@ -105,50 +105,18 @@ def create_report(
     if radar_zone:
         plt.xlim(0, 2.66)
         plt.ylim(-1, 1)
-        # Add a circle of radius 0.25, 0.5, 0.75 and 1 centered at (0,0) corresponding to 30 mph, 60 mph, 90 mph and 120 mph, fill grey gradients of colours, (outer being the darkest and inner being the lighter), and add the colour to the legend
-        plt.gca().add_patch(plt.Circle((0, 0), 0.25, fill=False, linestyle='--', color='grey'))
-        plt.gca().add_patch(plt.Circle((0, 0), 0.25, fill=True, alpha=0.1, color='grey'))
 
-        plt.gca().add_patch(plt.Circle((0, 0), 0.5, fill=False, linestyle='--', color='grey'))
-        plt.gca().add_patch(plt.Circle((0, 0), 0.5, fill=True, alpha=0.2, color='grey'))
-
-        plt.gca().add_patch(plt.Circle((0, 0), 0.75, fill=False, linestyle='--', color='grey'))
-        plt.gca().add_patch(plt.Circle((0, 0), 0.75, fill=True, alpha=0.3, color='grey'))
-
-        plt.gca().add_patch(plt.Circle((0, 0), 1, fill=False, linestyle='--', color='grey'))
-        plt.gca().add_patch(plt.Circle((0, 0), 1, fill=True, alpha=0.4, color='grey'))
-
-        # Remove both axis
         plt.gca().axes.get_xaxis().set_visible(False)
         plt.gca().axes.get_yaxis().set_visible(False)
+        
+        for i in range(1, 5):
+            plt.gca().add_patch(plt.Circle((0, 0), i*0.25, fill=False, linestyle='--', color='grey'))
+            plt.gca().add_patch(plt.Circle((0, 0), i*0.25, fill=True, alpha=0.1, color='grey'))
+            plt.text(0, i*0.25, f'{i*30} mph', horizontalalignment='center', verticalalignment='bottom')
 
-        # Add text to the circles
-        plt.text(0, 0.25, '30 mph', horizontalalignment='center', verticalalignment='bottom')
-        plt.text(0, 0.5, '60 mph', horizontalalignment='center', verticalalignment='bottom')
-        plt.text(0, 0.75, '90 mph', horizontalalignment='center', verticalalignment='bottom')
-        plt.text(0, 1, '120 mph', horizontalalignment='center', verticalalignment='bottom')
-
-        # Add a line starting at (0,0) with angle 0, 15, 30, 45, 60, -15, -30, -45, -60
-        plt.plot([0, 1], [0, 0], linestyle='-', color='grey')
-        plt.plot([0, math.cos(math.radians(15))], [0, math.sin(math.radians(15))], linestyle='--', color='grey')
-        plt.plot([0, math.cos(math.radians(30))], [0, math.sin(math.radians(30))], linestyle='--', color='grey')
-        plt.plot([0, math.cos(math.radians(45))], [0, math.sin(math.radians(45))], linestyle='-', color='grey')
-        plt.plot([0, math.cos(math.radians(60))], [0, math.sin(math.radians(60))], linestyle='--', color='grey')
-        plt.plot([0, math.cos(math.radians(-15))], [0, math.sin(math.radians(-15))], linestyle='--', color='grey')
-        plt.plot([0, math.cos(math.radians(-30))], [0, math.sin(math.radians(-30))], linestyle='--', color='grey')
-        plt.plot([0, math.cos(math.radians(-45))], [0, math.sin(math.radians(-45))], linestyle='-', color='grey')
-        plt.plot([0, math.cos(math.radians(-60))], [0, math.sin(math.radians(-60))], linestyle='--', color='grey')
-
-        # Add text to the lines
-        plt.text(1, 0, '0°', horizontalalignment='left', verticalalignment='center')
-        plt.text(math.cos(math.radians(15)), math.sin(math.radians(15)), '15°', horizontalalignment='left', verticalalignment='center')
-        plt.text(math.cos(math.radians(30)), math.sin(math.radians(30)), '30°', horizontalalignment='left', verticalalignment='center')
-        plt.text(math.cos(math.radians(45)), math.sin(math.radians(45)), '45°', horizontalalignment='left', verticalalignment='center')
-        plt.text(math.cos(math.radians(60)), math.sin(math.radians(60)), '60°', horizontalalignment='left', verticalalignment='center')
-        plt.text(math.cos(math.radians(-15)), math.sin(math.radians(-15)), '-15°', horizontalalignment='left', verticalalignment='center')
-        plt.text(math.cos(math.radians(-30)), math.sin(math.radians(-30)), '-30°', horizontalalignment='left', verticalalignment='center')
-        plt.text(math.cos(math.radians(-45)), math.sin(math.radians(-45)), '-45°', horizontalalignment='left', verticalalignment='center')
-        plt.text(math.cos(math.radians(-60)), math.sin(math.radians(-60)), '-60°', horizontalalignment='left', verticalalignment='center')
+        for i in range(-4, 5):
+            plt.plot([0, math.cos(math.radians(15*i))], [0, math.sin(math.radians(15*i))], linestyle='--', color='grey')
+            plt.text(math.cos(math.radians(15*i)), math.sin(math.radians(15*i)), f'  {i*15}°', horizontalalignment='left', verticalalignment='center')
 
     if strike_zone:
         plt.xlim(-3, 3)
