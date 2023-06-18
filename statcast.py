@@ -99,12 +99,11 @@ def create_report(
     data['colour'] = data[legend].map(mapping_dictionary)
     # Drop rows when the value in the colour column is NaN
     data = data.dropna(subset=['colour'])
-    data.plot.scatter(x=plotting_columns[0], y=plotting_columns[1], c=data['colour'], figsize=(9.6, 7.2), edgecolors='black', linewidths=0.5)
+    data.plot.scatter(x=plotting_columns[0], y=plotting_columns[1], c=data['colour'], figsize=(9.6, 7.2))#, edgecolors='black', linewidths=0.5)
     handles = [plt.Line2D([0], [0], marker='o', color='w', label=k, markerfacecolor=v, markersize=10) for k,v in mapping_dictionary.items()]
     
     if radar_zone:
-        print("Plotting radar zone")
-        plt.xlim(-1, 1)
+        plt.xlim(0, 2.66)
         plt.ylim(-1, 1)
         # Add a circle of radius 0.25, 0.5, 0.75 and 1 centered at (0,0) corresponding to 30 mph, 60 mph, 90 mph and 120 mph, fill grey gradients of colours, (outer being the darkest and inner being the lighter), and add the colour to the legend
         plt.gca().add_patch(plt.Circle((0, 0), 0.25, fill=False, linestyle='--', color='grey'))
@@ -118,6 +117,38 @@ def create_report(
 
         plt.gca().add_patch(plt.Circle((0, 0), 1, fill=False, linestyle='--', color='grey'))
         plt.gca().add_patch(plt.Circle((0, 0), 1, fill=True, alpha=0.4, color='grey'))
+
+        # Remove both axis
+        plt.gca().axes.get_xaxis().set_visible(False)
+        plt.gca().axes.get_yaxis().set_visible(False)
+
+        # Add text to the circles
+        plt.text(0, 0.25, '30 mph', horizontalalignment='center', verticalalignment='bottom')
+        plt.text(0, 0.5, '60 mph', horizontalalignment='center', verticalalignment='bottom')
+        plt.text(0, 0.75, '90 mph', horizontalalignment='center', verticalalignment='bottom')
+        plt.text(0, 1, '120 mph', horizontalalignment='center', verticalalignment='bottom')
+
+        # Add a line starting at (0,0) with angle 0, 15, 30, 45, 60, -15, -30, -45, -60
+        plt.plot([0, 1], [0, 0], linestyle='-', color='grey')
+        plt.plot([0, math.cos(math.radians(15))], [0, math.sin(math.radians(15))], linestyle='--', color='grey')
+        plt.plot([0, math.cos(math.radians(30))], [0, math.sin(math.radians(30))], linestyle='--', color='grey')
+        plt.plot([0, math.cos(math.radians(45))], [0, math.sin(math.radians(45))], linestyle='-', color='grey')
+        plt.plot([0, math.cos(math.radians(60))], [0, math.sin(math.radians(60))], linestyle='--', color='grey')
+        plt.plot([0, math.cos(math.radians(-15))], [0, math.sin(math.radians(-15))], linestyle='--', color='grey')
+        plt.plot([0, math.cos(math.radians(-30))], [0, math.sin(math.radians(-30))], linestyle='--', color='grey')
+        plt.plot([0, math.cos(math.radians(-45))], [0, math.sin(math.radians(-45))], linestyle='-', color='grey')
+        plt.plot([0, math.cos(math.radians(-60))], [0, math.sin(math.radians(-60))], linestyle='--', color='grey')
+
+        # Add text to the lines
+        plt.text(1, 0, '0°', horizontalalignment='left', verticalalignment='center')
+        plt.text(math.cos(math.radians(15)), math.sin(math.radians(15)), '15°', horizontalalignment='left', verticalalignment='center')
+        plt.text(math.cos(math.radians(30)), math.sin(math.radians(30)), '30°', horizontalalignment='left', verticalalignment='center')
+        plt.text(math.cos(math.radians(45)), math.sin(math.radians(45)), '45°', horizontalalignment='left', verticalalignment='center')
+        plt.text(math.cos(math.radians(60)), math.sin(math.radians(60)), '60°', horizontalalignment='left', verticalalignment='center')
+        plt.text(math.cos(math.radians(-15)), math.sin(math.radians(-15)), '-15°', horizontalalignment='left', verticalalignment='center')
+        plt.text(math.cos(math.radians(-30)), math.sin(math.radians(-30)), '-30°', horizontalalignment='left', verticalalignment='center')
+        plt.text(math.cos(math.radians(-45)), math.sin(math.radians(-45)), '-45°', horizontalalignment='left', verticalalignment='center')
+        plt.text(math.cos(math.radians(-60)), math.sin(math.radians(-60)), '-60°', horizontalalignment='left', verticalalignment='center')
 
     if strike_zone:
         plt.xlim(-3, 3)
@@ -274,7 +305,7 @@ def generate_homeplate_by_pitcher(data: pd.DataFrame, pitcher:str) -> None:
         f"{pitcher} on {gamedate} [{away_team}@{home_team}] (homeplate)",
         f"homeplate_{gamedate}",
         f"{pitcher}_homeplate_{gamedate}.png",
-        True
+        strike_zone=True
     )
 
 def generate_all_homeplate(data: pd.DataFrame) -> None:
@@ -420,15 +451,13 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     )
 
 if __name__ == '__main__':
-    # for team in mlb_teams:
-    #     data = get_statcast(team)
-    #     if data.empty:
-    #         print(f"Team {team} has no data")
-    #         continue
-    #     generate_all_release(data)
-    #     generate_all_homeplate(data)
-    #     in_play_report(data, team)
-    #     generate_all_boxplot_report(data)
-    team = 'BOS'
-    data = get_statcast(team=team, start_date='2023-06-16', end_date='2023-06-16')
-    create_radar_report(data, team)
+    for team in mlb_teams:
+        data = get_statcast(team=team)
+        if data.empty:
+            print(f"Team {team} has no data")
+            continue
+        generate_all_release(data)
+        generate_all_homeplate(data)
+        in_play_report(data, team)
+        generate_all_boxplot_report(data)
+        create_radar_report(data, team)
