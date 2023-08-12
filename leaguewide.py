@@ -132,8 +132,3 @@ if __name__=='__main__':
     df = get_stats('2023', 'pit')
     # correlation_columns(df, 'ERA', 'FIP')
     correlation_matrix(df)
-    
-
-
-
-
