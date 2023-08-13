@@ -154,7 +154,58 @@ def correlation_matrix(df: pd.DataFrame) -> None:
     sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, annot=True, cmap=sns.diverging_palette(220, 20, as_cmap=True), vmin=-1, vmax=1, center=0, square=True, linewidths=.5, cbar_kws={"shrink": .5})
     plt.show()
 
+def report_histogram(df: pd.DataFrame, cols: list) -> None:
+    """
+    Create a histogram for each column given for a dataframe, and show them all in one.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The dataframe.
+    cols : list
+        The list of columns.
+
+    Returns
+    -------
+    None
+    """
+    fig, axes = plt.subplots(ncols=1, nrows=len(cols), figsize=(5, 30))
+    for i, col in enumerate(cols):
+        sns.histplot(data=df, x=col, ax=axes[i], kde=True)
+        mean = df[col].mean()
+        axes[i].axvline(mean, color='r', linestyle='--')
+        axes[i].text(0.05, 0.9, f'Mean: {round(mean, 2)}', transform=axes[i].transAxes)
+    plt.show()
+
+def report_boxplot(df: pd.DataFrame, cols: list) -> None:
+    """
+    Create a boxplot for each column given for a dataframe, and show them all in one, with the same x-axis.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The dataframe.
+    cols : list
+        The list of columns.
+
+    Returns
+    -------
+    None
+    """
+    fig, axes = plt.subplots(ncols=1, nrows=len(cols), figsize=(5, 30))
+    for i, col in enumerate(cols):
+        sns.boxplot(x=df[col], ax=axes[i])
+        mean = df[col].mean()
+        axes[i].axvline(mean, color='r', linestyle='--')
+        # Add the numerical value of the quartiles, median and mean, rounded to 2 decimals
+        axes[i].text(0.05, 0.9, f'Q1: {round(df[col].quantile(0.25), 2)}', transform=axes[i].transAxes)
+        axes[i].text(0.05, 0.8, f'Median: {round(df[col].median(), 2)}', transform=axes[i].transAxes)
+        axes[i].text(0.05, 0.7, f'Q3: {round(df[col].quantile(0.75), 2)}', transform=axes[i].transAxes)
+        axes[i].text(0.05, 0.6, f'Mean: {round(mean, 2)}', transform=axes[i].transAxes)
+        #axes[i].set_title(col)
+    plt.show()
+
 if __name__=='__main__':
-    df = get_stats('2023', 'pit')
-    # correlation_columns(df, 'ERA', 'FIP')
-    correlation_matrix(df)
+    df = get_stats('2023', 'pit')#, min_ip='0')
+    report_histogram(df, ['ERA', 'FIP'])
+    report_boxplot(df, ['ERA', 'FIP'])
