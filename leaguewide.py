@@ -63,6 +63,32 @@ def get_data_from_html(page: BeautifulSoup) -> pd.DataFrame:
     return df
 
 def get_stats(season: str, stats: str, month: str = '0', league: str='all', min_ip: str='y', team: str='0', max_players: str = '500') -> pd.DataFrame:
+    """	
+    Get the stats of a season.
+
+    Parameters
+    ----------
+    season : str
+        The season as a string.
+    stats : str
+        The stats to get. Must be one of 'pit', 'bat' or 'fld', which account for pitching, batting and fielding, respectively.
+    month : str, optional
+        The month of the season. The default is '0', which means the whole season.
+    league : str, optional
+        The league. The default is 'all'.
+    min_ip : str, optional
+        The minimum innings pitched. The default is 'y', which means qualified.
+    team : str, optional
+        The team. The default is '0', which means all teams. Otherwise, it must be '1' to '30'.
+    max_players : str, optional
+        The maximum number of players. The default is '500', which should suffice generally.
+
+    Returns
+    -------
+    pd.DataFrame
+        The stats of the season.
+    """
+    
     if stats in ['pit', 'bat', 'fld']:
         url = f"https://www.fangraphs.com/leaders.aspx?pos=all&stats={stats}&lg={league}&qual={min_ip}&type=8&season={season}&month={month}&season1=2023&ind=0&team={team}&page=1_{max_players}"
     else:
