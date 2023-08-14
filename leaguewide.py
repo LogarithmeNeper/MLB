@@ -90,7 +90,7 @@ def get_stats(season: str, stats: str, month: str = '0', league: str='all', min_
     """
     
     if stats in ['pit', 'bat', 'fld']:
-        url = f"https://www.fangraphs.com/leaders.aspx?pos=all&stats={stats}&lg={league}&qual={min_ip}&type=8&season={season}&month={month}&season1=2023&ind=0&team={team}&page=1_{max_players}"
+        url = f"https://www.fangraphs.com/leaders.aspx?pos=all&stats={stats}&lg={league}&qual={min_ip}&type=8&season={season}&month={month}&season1={season}&ind=0&team={team}&page=1_{max_players}"
     else:
         raise ValueError('stats must be one of pit, bat or fld')
     
@@ -206,6 +206,7 @@ def report_boxplot(df: pd.DataFrame, cols: list) -> None:
     plt.show()
 
 if __name__=='__main__':
-    df = get_stats('2023', 'pit')#, min_ip='0')
+    df = get_stats('2022', 'pit', min_ip='0')
+    correlation_columns(df, 'IP', 'ERA')
     report_histogram(df, ['ERA', 'FIP'])
     report_boxplot(df, ['ERA', 'FIP'])
