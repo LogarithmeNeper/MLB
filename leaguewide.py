@@ -100,7 +100,7 @@ def get_stats(season: str, stats: str, month: str = '0', league: str='all', min_
     table = table.apply(pd.to_numeric, errors='ignore')
     return table
 
-def correlation_columns(df: pd.DataFrame, col1: str, col2: str, idx: str = None) -> None:
+def correlation_columns(df: pd.DataFrame, col1: str, col2: str, idx: str = None, linreg: bool = False, quadrants: bool = False) -> None:
     """
     Create a scatterplot of two columns in a dataframe, and add linear regression.
 
@@ -122,9 +122,16 @@ def correlation_columns(df: pd.DataFrame, col1: str, col2: str, idx: str = None)
     # Linear regression
     x = df[col1].values.reshape(-1, 1)
     y = df[col2].values.reshape(-1, 1)
-    reg = sklearn.linear_model.LinearRegression()
-    reg.fit(x, y)
-    y_pred = reg.predict(x)
+    if linreg:
+        reg = sklearn.linear_model.LinearRegression()
+        reg.fit(x, y)
+        y_pred = reg.predict(x)
+        plt.text(0.05, 0.9, f'R^2: {round(reg.score(x, y), 2)}', transform=plt.gca().transAxes)
+    if quadrants:
+        vline = df[col1].median()
+        hline = df[col2].median()
+        plt.axvline(vline, color='grey', linestyle='--')
+        plt.axhline(hline, color='grey', linestyle='--')
     # Plot the scatterplot
     plt.scatter(df[col1], df[col2])
     if idx is not None:
@@ -133,7 +140,7 @@ def correlation_columns(df: pd.DataFrame, col1: str, col2: str, idx: str = None)
     plt.xlabel(col1)
     plt.ylabel(col2)
     plt.plot(x, y_pred, color='red')
-    plt.title(f'{col1} vs {col2}, R^2 = {reg.score(x, y)}')
+    plt.title(f'{col1} vs {col2}')
     plt.show()
 
 def correlation_matrix(df: pd.DataFrame) -> None:
@@ -212,6 +219,6 @@ def report_boxplot(df: pd.DataFrame, cols: list) -> None:
 
 if __name__=='__main__':
     df = get_stats('2023', 'pit', min_ip='y')
-    correlation_columns(df, 'IP', 'ERA', 'Name')
-    report_histogram(df, ['ERA', 'FIP'])
-    report_boxplot(df, ['ERA', 'FIP'])
+    correlation_columns(df, 'FIP', 'ERA', 'Name', linreg=True, quadrants=True)
+    # report_histogram(df, ['ERA', 'FIP'])
+    # report_boxplot(df, ['ERA', 'FIP'])
