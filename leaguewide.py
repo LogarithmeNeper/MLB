@@ -114,6 +114,10 @@ def correlation_columns(df: pd.DataFrame, col1: str, col2: str, idx: str = None,
         The second column.
     idx : str, optional
         The index of the dataframe. The default is None.
+    linreg : bool, optional
+        Whether to add linear regression. The default is False.
+    quadrants : bool, optional
+        Whether to add the median lines. The default is False.
 
     Returns
     -------
