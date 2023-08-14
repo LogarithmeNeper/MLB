@@ -100,7 +100,7 @@ def get_stats(season: str, stats: str, month: str = '0', league: str='all', min_
     table = table.apply(pd.to_numeric, errors='ignore')
     return table
 
-def correlation_columns(df: pd.DataFrame, col1: str, col2: str) -> None:
+def correlation_columns(df: pd.DataFrame, col1: str, col2: str, idx: str = None) -> None:
     """
     Create a scatterplot of two columns in a dataframe, and add linear regression.
 
@@ -112,6 +112,8 @@ def correlation_columns(df: pd.DataFrame, col1: str, col2: str) -> None:
         The first column.
     col2 : str
         The second column.
+    idx : str, optional
+        The index of the dataframe. The default is None.
 
     Returns
     -------
@@ -125,6 +127,9 @@ def correlation_columns(df: pd.DataFrame, col1: str, col2: str) -> None:
     y_pred = reg.predict(x)
     # Plot the scatterplot
     plt.scatter(df[col1], df[col2])
+    if idx is not None:
+        for i, txt in enumerate(df[idx]):
+            plt.annotate(txt, (df[col1][i], df[col2][i]))
     plt.xlabel(col1)
     plt.ylabel(col2)
     plt.plot(x, y_pred, color='red')
@@ -206,7 +211,7 @@ def report_boxplot(df: pd.DataFrame, cols: list) -> None:
     plt.show()
 
 if __name__=='__main__':
-    df = get_stats('2022', 'pit', min_ip='0')
-    correlation_columns(df, 'IP', 'ERA')
+    df = get_stats('2023', 'pit', min_ip='y')
+    correlation_columns(df, 'IP', 'ERA', 'Name')
     report_histogram(df, ['ERA', 'FIP'])
     report_boxplot(df, ['ERA', 'FIP'])
