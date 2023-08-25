@@ -105,7 +105,7 @@ def inside_static_strikezone(pos_x: float, pos_z: float) -> bool:
 
 if __name__ == '__main__':
     # Be careful with the dates especially when working at midnight ;)
-    for team in ['HOU', 'BOS']:
+    for team in mlb_teams:
         data = pybaseball.statcast(team=team)
         if not data.empty:
             report_wrong_calls(data, team)

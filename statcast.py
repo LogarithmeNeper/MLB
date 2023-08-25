@@ -419,7 +419,7 @@ def in_play_report(data: pd.DataFrame, team: str) -> None:
     )
 
 if __name__ == '__main__':
-    for team in ['HOU', 'BOS']:
+    for team in mlb_teams:
         data = get_statcast(team=team)
         if data.empty:
             print(f"Team {team} has no data")
