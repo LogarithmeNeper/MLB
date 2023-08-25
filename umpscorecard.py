@@ -21,8 +21,9 @@ def prune_dataset(data: pd.DataFrame) -> pd.DataFrame:
     pd.DataFrame
         The data of the team with only the rows that are called strikes outside the strikezone or balls inside the strikezone.
     """
-    data = data[['plate_x', 'plate_z', 'description', 'delta_run_exp']]
-    data = data[(data['description'] == 'called_strike') & (data.apply(lambda row: not inside_static_strikezone(row['plate_x'], row['plate_z']), axis=1)) | (data['description'] == 'ball') & (data.apply(lambda row: inside_static_strikezone(row['plate_x'], row['plate_z']), axis=1))]
+    data = data[['plate_x', 'plate_z', 'description', 'delta_run_exp', 'sz_top', 'sz_bot']]
+    data = data.dropna()
+    data = data[(data['description'] == 'called_strike') & (data.apply(lambda row: not inside_variable_strikezone(row['plate_x'], row['plate_z'], row['sz_top'], row['sz_bot']), axis=1)) | (data['description'] == 'ball') & (data.apply(lambda row: inside_variable_strikezone(row['plate_x'], row['plate_z'], row['sz_top'], row['sz_bot']), axis=1))]
     return data
 
 def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
@@ -44,7 +45,8 @@ def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
     away_team = data['away_team'].unique()[0]
     outfolder = f"boxplot_{gamedate}"
     data = prune_dataset(data)
-    pitcher_advantage, batter_advantage = compute_static_scorecard_team(data)
+    data.to_csv('data.csv')
+    pitcher_advantage, batter_advantage = compute_scorecard_team(data)
     return create_report(
         data,
         ['plate_x', 'plate_z'],
@@ -55,7 +57,7 @@ def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
         f"ump_report_{team}_{gamedate}",
         True)
 
-def compute_static_scorecard_team(data: pd.DataFrame) -> float:
+def compute_scorecard_team(data: pd.DataFrame) -> float:
     """
     Computes the run advantage of a team based on the umpire's calls on the strikezone.
 
@@ -74,7 +76,7 @@ def compute_static_scorecard_team(data: pd.DataFrame) -> float:
     data = prune_dataset(data)
     # Iterate over all pitches
     for i in range(len(data)):
-        _, _, description, delta_run_exp = data.iloc[i]
+        _, _, description, delta_run_exp, _, _ = data.iloc[i]
         # For both ifs, we already pruned the dataset accordingly so we don't have to check if the pitch is inside the strikezone.
         if description == 'called_strike':
             pitcher_advantage += abs(delta_run_exp)
@@ -82,7 +84,7 @@ def compute_static_scorecard_team(data: pd.DataFrame) -> float:
             batter_advantage += abs(delta_run_exp)
     return pitcher_advantage, batter_advantage
 
-def inside_static_strikezone(pos_x: float, pos_z: float) -> bool:
+def inside_variable_strikezone(pos_x: float, pos_z: float, sz_top: float, sz_bot: float) -> bool:
     """
     Computes whether a pitch is inside the static strikezone. (independent of the batter's stance)
 
@@ -94,16 +96,20 @@ def inside_static_strikezone(pos_x: float, pos_z: float) -> bool:
     pos_z : float
         The z position of the pitch at the plate.
 
+    sz_top : float
+        The top of the strikezone.
+
+    sz_bot : float
+        The bottom of the strikezone.
+
     Returns
     -------
     bool
-        Whether the pitch is inside the static strikezone.
+        Whether the pitch is inside the strikezone.
     """
-    # return (pos_x >= -0.7083 and pos_x <= 0.7083 and pos_z >= 1.5 and pos_z <= 3.5)
-    return (pos_x >= -0.7083-0.241667/2 and pos_x <= 0.7083+0.241667/2 and pos_z >= 1.5-0.241667/2 and pos_z <= 3.5+0.241667/2)
-
-def get_batter_stance(player):
-    pass
+    # if sz_top is None or sz_bot is None:
+    #     return (pos_x >= -0.7083-0.241667/2 and pos_x <= 0.7083+0.241667/2 and pos_z >= 1.5-0.241667/2 and pos_z <= 3.5+0.241667/2)
+    return (pos_x >= -0.7083-0.241667/2 and pos_x <= 0.7083+0.241667/2 and pos_z >= sz_bot-0.241667/2 and pos_z <= sz_top+0.241667/2)
 
 if __name__ == '__main__':
     # Be careful with the dates especially when working at midnight ;)
