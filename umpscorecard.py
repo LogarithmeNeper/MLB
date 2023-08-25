@@ -43,7 +43,7 @@ def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
     gamedate = str(data['game_date'].unique()[0])[:10]
     home_team = data['home_team'].unique()[0]
     away_team = data['away_team'].unique()[0]
-    outfolder = f"boxplot_{gamedate}"
+    outfolder = f"ump_report_{gamedate}"
     data = prune_dataset(data)
     data.to_csv('data.csv')
     pitcher_advantage, batter_advantage = compute_scorecard_team(data)
@@ -53,7 +53,7 @@ def report_wrong_calls(data: pd.DataFrame, team: str) -> None:
         'description',
         calls,
         f"Wrong calls for {team}'s pitchers on {gamedate} [{away_team}@{home_team}]\n Pitcher advantage: {pitcher_advantage:.2f} runs \n Opp. batters advantage: {batter_advantage:.2f} runs",
-        f"ump_report_{gamedate}", 
+        outfolder, 
         f"ump_report_{team}_{gamedate}",
         radar_zone=False,
         strike_zone=True)
