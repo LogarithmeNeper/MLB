@@ -108,8 +108,6 @@ def inside_variable_strikezone(pos_x: float, pos_z: float, sz_top: float, sz_bot
     bool
         Whether the pitch is inside the strikezone.
     """
-    # if sz_top is None or sz_bot is None:
-    #     return (pos_x >= -0.7083-0.241667/2 and pos_x <= 0.7083+0.241667/2 and pos_z >= 1.5-0.241667/2 and pos_z <= 3.5+0.241667/2)
     return (pos_x >= -0.7083-0.241667/2 and pos_x <= 0.7083+0.241667/2 and pos_z >= sz_bot-0.241667/2 and pos_z <= sz_top+0.241667/2)
 
 if __name__ == '__main__':
